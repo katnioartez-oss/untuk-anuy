@@ -103,7 +103,11 @@
 
   /* ================= Scene 1: envelope + letter ================= */
   .envelope{
-    width: min(74vw, 240px); aspect-ratio: 3/2; position:center; cursor:pointer;
+    width: min(74vw, 240px);
+    aspect-ratio: 3/2;
+    position: relative;      /* fixed: was the invalid value "center" */
+    margin: 0 auto;          /* extra safety net so it's always centered */
+    cursor:pointer;
     filter: drop-shadow(0 14px 26px rgba(232,57,127,.35));
   }
   .envelope .body{ position:absolute; inset:0; background: linear-gradient(160deg, var(--pink), var(--pink-deep)); border-radius: 14px; }
@@ -118,6 +122,8 @@
   .envelope .heart-seal{ position:absolute; top:38%; left:50%; transform: translate(-50%,-50%); font-size:1.6rem; z-index:2; animation: pulse 1.8s ease-in-out infinite; }
   .envelope.open .flap{ transform: rotateX(180deg); }
   @keyframes pulse{ 0%,100%{ transform: translate(-50%,-50%) scale(1);} 50%{ transform: translate(-50%,-50%) scale(1.12);} }
+
+  #envelopeStage{ display:flex; flex-direction:column; align-items:center; }
 
   .letter-card{
     background: var(--surface); border:1px solid var(--surface-border); border-radius: 20px; padding: 1.8rem 1.6rem;
@@ -155,6 +161,7 @@
     padding: 1.1rem 1.4rem; border-radius: 10px; max-width: 340px; min-height: 3rem;
     box-shadow: 0 8px 20px rgba(232,57,127,.25); transform: rotate(-1deg);
     opacity:0; transition: opacity .3s ease;
+    margin: 0 auto;
   }
   .fortune-slip.show{ opacity:1; }
   .fortune-count{ font-size:.78rem; color: var(--muted); }
@@ -177,8 +184,29 @@
   .photo-fallback code{ background: rgba(255,255,255,.08); padding:.05rem .3rem; border-radius:5px; }
 
   /* video */
-  .video-card{ background: var(--surface); border:1px solid var(--surface-border); border-radius:20px; padding:1rem; width:100%; max-width:400px; position:relative; }
-  .video-card video{ width:100%; border-radius:14px; display:block; background:#000; max-height:48vh; }
+  .video-card{
+    background: var(--surface);
+    border:1px solid var(--surface-border);
+    border-radius:20px;
+    padding:1rem;
+    width:100%;
+    max-width:400px;
+    margin: 0 auto;           /* keeps the card itself centered */
+    position:relative;
+    display:flex;
+    justify-content:center;
+  }
+  .video-card video{
+    width:100%;
+    max-width:100%;
+    height:auto;
+    max-height:48vh;
+    border-radius:14px;
+    display:block;
+    background:#000;
+    object-fit:contain;
+    margin:0 auto;
+  }
   .video-fallback{
     position:absolute; inset:1rem; border-radius:14px; background: rgba(255,255,255,.04);
     display:flex; align-items:center; justify-content:center; text-align:center;
@@ -249,7 +277,7 @@
           <p>Untuk Anuy, orang yang paling Mimi sayang</p>
           <p>Aku pernah berpikir, waktu tidak sekadar merangkai detik. Semesta sedang menenun sebuah proses pendewasaan yang terlalu tenang untuk riuh dunia, dan kemudian membentuknya menjadi keteguhan dalam diri seorang Yanur.</p>
           <p> Sebab ada sesuatu dalam dirimu yang melampaui sekadar pertambahan angka. Sebelum hari-hari menagih pembuktian tentang arti menjadi kuat, keberadaanmu di usia ke-22 ini sudah menjadi jawaban bahwasanya ketabahan tidak selalu harus bersuara nyaring. Di balik tenang dan lembut yang kau simpan, ada jiwa yang tak pernah menyerah pada badai.</p>
-          <p>SDua puluh dua tahun bukanlah sekadar angka perjalanan, melainkan cara dunia merayakan keteguhanmu. Hari ini, doa-doa terbaik melangit—memohon agar setiap langkahmu senantiasa dilindungi, tubuh dan jiwamu diberi ketenangan, serta setiap mimpi yang kau perjuangkan pelan-pelan menemukan bentuk terindahnya. Semoga kamu senantiasa tumbuh menjadi pribadi yang hangat, kuat, dan dirahmati di setiap langkah.</p>
+          <p>Dua puluh dua tahun bukanlah sekadar angka perjalanan, melainkan cara dunia merayakan keteguhanmu. Hari ini, doa-doa terbaik melangit—memohon agar setiap langkahmu senantiasa dilindungi, tubuh dan jiwamu diberi ketenangan, serta setiap mimpi yang kau perjuangkan pelan-pelan menemukan bentuk terindahnya. Semoga kamu senantiasa tumbuh menjadi pribadi yang hangat, kuat, dan dirahmati di setiap langkah.</p>
           <p>Selamat bertambah usia, Yanur.</p>
           <p class="letter-sign">— Dari Mimi, yang selalu mendoakan dan menyayangimu💗</p>
         </div>
@@ -324,7 +352,6 @@
         controls
         playsinline
         preload="metadata"
-        width="100%"
     >
         <source src="anuy/video/untuk-anyuy.mp4" type="video/mp4">
 
@@ -343,8 +370,9 @@
   <section class="scene" data-scene="3">
     <div class="scene-inner">
       <span class="eyebrow">sekali lagi,</span>
-      <h1>Selamat Ulang Tahun, Anuy 🎂</h1>
-      <p>22 tahun makin mantap, makin sayang, makin kangen pengen ketemu.</p>
+      <h1>Met ulang tahunn, Anuy kesayangan Mimi! Hari 🎂</h1>
+      <p>Semoga anuy sehat terus, jangan mual-mual lagi. Dan semoga semua rencana serta mimpi anuy pelan-pelan kewujud, satu-satu.</p>
+      <p>Semoga suatu hari kita beneran bisa pelukan lama, lamaaa banget.🥺👉👈</p>
       <p style="font-family: var(--font-display); font-size:1.1rem; color: var(--pink-soft);">Dari Mimi, yang sayang anuy walau belum pernah ketemu 💗</p>
       <div class="final-btns">
         <div class="final-btn-wrap"><button class="btn" id="hugBtn">Give Hug 🤗</button></div>
