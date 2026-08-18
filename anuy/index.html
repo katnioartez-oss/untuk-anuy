@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Untuk Anuy, dari Mimi 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A090C;
+    --bg-2: #17121A;
+    --surface: rgba(255,255,255,.045);
+    --surface-border: rgba(255,111,181,.22);
+    --pink: #FF6FB5;
+    --pink-deep: #E8397F;
+    --pink-soft: #FFB8DA;
+    --white: #F7EEF3;
+    --muted: #C9A9BC;
+    --font-display: 'Fredoka', sans-serif;
+    --font-body: 'Quicksand', sans-serif;
+    --font-letter: 'Cormorant Garamond', serif;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color: transparent; }
+  html,body{ height:100%; overscroll-behavior:none; }
+  body{
+    font-family: var(--font-body);
+    background: radial-gradient(circle at 50% 0%, var(--bg-2), var(--bg) 65%);
+    color: var(--white);
+    overflow:hidden;
+    position:relative;
+  }
+
+  /* ================= ambient sparkles ================= */
+  .ambient{ position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+  .ambient span{ position:absolute; top:-40px; font-size: 1.2rem; opacity:.5; animation: fall linear infinite; }
+  @keyframes fall{
+    0%{ transform: translateY(0) translateX(0) rotate(0deg); opacity:0; }
+    8%{ opacity:.55; }
+    92%{ opacity:.4; }
+    100%{ transform: translateY(112vh) translateX(30px) rotate(200deg); opacity:0; }
+  }
+
+  .stage{ position:relative; z-index:1; height:100vh; width:100%; }
+
+  .scene{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    padding: 6vh 6vw 13vh;
+    opacity:0; visibility:hidden;
+    transform: translateY(18px) scale(.98);
+    transition: opacity .5s ease, transform .5s ease, visibility .5s;
+    text-align:center;
+  }
+  .scene.active{ opacity:1; visibility:visible; transform: translateY(0) scale(1); }
+  .scene-inner{ max-width: 640px; width:100%; display:flex; flex-direction:column; align-items:center; gap: 1.1rem; }
+
+  .eyebrow{
+    font-family: var(--font-body); font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    font-size:.68rem; color: var(--pink-soft);
+    background: var(--surface); border:1px solid var(--surface-border);
+    padding:.35rem .9rem; border-radius:999px;
+  }
+
+  h1,h2{ font-family: var(--font-display); font-weight:600; line-height:1.15; color: var(--white); }
+  h1{ font-size: clamp(1.8rem, 6vw, 2.8rem); }
+  h2{ font-size: clamp(1.35rem, 4.4vw, 2rem); }
+  p{ font-size: clamp(1rem, 2.3vw, 1.08rem); color: var(--muted); line-height:1.65; }
+
+  .btn{
+    font-family: var(--font-body); font-weight:700; font-size:1rem;
+    color:#1A0A12; background: linear-gradient(135deg, var(--pink), var(--pink-deep));
+    border:none; padding: .9rem 1.8rem; border-radius:999px; cursor:pointer;
+    box-shadow: 0 8px 24px rgba(232,57,127,.4);
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .btn:hover{ transform: translateY(-2px) scale(1.03); }
+  .btn:active{ transform: translateY(0) scale(.98); }
+  .btn:focus-visible{ outline: 3px solid var(--pink-soft); outline-offset:3px; }
+  .btn.ghost{ background: var(--surface); color: var(--white); border: 1.5px solid var(--surface-border); box-shadow:none; }
+  .btn.small{ padding:.6rem 1.2rem; font-size:.85rem; }
+
+  /* ================= Scene 0: passcode lock ================= */
+  .lock-icon{ font-size:2.2rem; }
+  .dots-code{ display:flex; gap:.6rem; margin: .3rem 0; }
+  .dot-code{ width:12px; height:12px; border-radius:50%; border:2px solid rgba(255,184,218,.4); transition: background .2s, transform .2s; }
+  .dot-code.filled{ background: var(--pink); border-color: var(--pink); transform: scale(1.15); }
+  .keypad{ display:grid; grid-template-columns: repeat(3, 64px); gap:.7rem; margin-top:.4rem; }
+  .key{
+    width:64px; height:64px; border-radius:50%; border:none; cursor:pointer;
+    background: var(--surface); border:1px solid var(--surface-border); color:var(--white); font-size:1.3rem; font-family: var(--font-body); font-weight:600;
+    transition: background .15s, transform .1s;
+  }
+  .key:hover{ background: rgba(255,111,181,.15); }
+  .key:active{ transform: scale(.92); }
+  .key.fn{ font-size:1rem; color: var(--pink-soft); }
+  .hint{ font-size:.8rem; color: var(--muted); }
+  .lock-error{ font-size:.85rem; color:#FF9FAE; min-height:1.2rem; font-weight:700; }
+  .shake{ animation: shakeAnim .4s; }
+  @keyframes shakeAnim{ 0%,100%{transform:translateX(0);} 20%{transform:translateX(-10px);} 40%{transform:translateX(10px);} 60%{transform:translateX(-8px);} 80%{transform:translateX(8px);} }
+
+  /* ================= Scene 1: envelope + letter ================= */
+  .envelope{
+    width: min(74vw, 240px); aspect-ratio: 3/2; position:relative; cursor:pointer;
+    filter: drop-shadow(0 14px 26px rgba(232,57,127,.35));
+  }
+  .envelope .body{ position:absolute; inset:0; background: linear-gradient(160deg, var(--pink), var(--pink-deep)); border-radius: 14px; }
+  .envelope .flap{
+    position:absolute; top:0; left:0; right:0; height:60%;
+    background: linear-gradient(160deg, var(--pink-deep), #B01F5F);
+    clip-path: polygon(0 0, 100% 0, 50% 85%);
+    transform-origin: top center;
+    transition: transform .6s cubic-bezier(.65,-0.2,.35,1.3);
+    border-radius: 14px 14px 0 0;
+  }
+  .envelope .heart-seal{ position:absolute; top:38%; left:50%; transform: translate(-50%,-50%); font-size:1.6rem; z-index:2; animation: pulse 1.8s ease-in-out infinite; }
+  .envelope.open .flap{ transform: rotateX(180deg); }
+  @keyframes pulse{ 0%,100%{ transform: translate(-50%,-50%) scale(1);} 50%{ transform: translate(-50%,-50%) scale(1.12);} }
+
+  .letter-card{
+    background: var(--surface); border:1px solid var(--surface-border); border-radius: 20px; padding: 1.8rem 1.6rem;
+    max-height: 54vh; overflow-y:auto; text-align:left;
+  }
+  .letter-card::-webkit-scrollbar{ width:5px; }
+  .letter-card::-webkit-scrollbar-thumb{ background: var(--pink); border-radius:3px; }
+  .letter-card p{ font-family: var(--font-letter); font-size:1.18rem; color: var(--white); line-height:1.75; margin-bottom: .9rem; }
+  .letter-sign{ font-weight:700; color: var(--pink-soft) !important; text-align:right; }
+
+  /* ================= confetti ================= */
+  .confetti-piece{ position:fixed; top:-20px; z-index:5; border-radius:2px; pointer-events:none; animation: confettiFall 2.6s ease-in forwards; }
+  @keyframes confettiFall{ to{ transform: translateY(105vh) rotate(540deg); opacity:.2; } }
+
+  /* ================= Scene 2: hub ================= */
+  .choice-grid{ display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; width:100%; }
+  .choice-card{
+    background: var(--surface); border:1px solid var(--surface-border); border-radius:18px;
+    padding: 1.4rem 1.1rem; width: 150px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:.5rem;
+    transition: transform .2s, background .2s;
+  }
+  .choice-card:hover{ transform: translateY(-4px); background: rgba(255,111,181,.1); }
+  .choice-card .ic{ font-size:2.3rem; }
+  .choice-card span{ font-weight:700; font-family: var(--font-display); font-size:.95rem; }
+
+  .hub-panel{ display:flex; flex-direction:column; align-items:center; gap:1rem; width:100%; }
+  .back-link{ background:none; border:none; color: var(--pink-soft); font-weight:700; font-size:.85rem; cursor:pointer; }
+
+  /* fortune bottle */
+  .bottle{ font-size:4.5rem; cursor:pointer; transition: transform .15s; }
+  .bottle.shaking{ animation: jarShake .5s; }
+  @keyframes jarShake{ 0%,100%{transform:rotate(0);} 20%{transform:rotate(-8deg);} 40%{transform:rotate(8deg);} 60%{transform:rotate(-6deg);} 80%{transform:rotate(6deg);} }
+  .fortune-slip{
+    background: var(--pink-soft); color:#3A0F26; font-family: var(--font-letter); font-size:1.15rem;
+    padding: 1.1rem 1.4rem; border-radius: 10px; max-width: 340px; min-height: 3rem;
+    box-shadow: 0 8px 20px rgba(232,57,127,.25); transform: rotate(-1deg);
+    opacity:0; transition: opacity .3s ease;
+  }
+  .fortune-slip.show{ opacity:1; }
+  .fortune-count{ font-size:.78rem; color: var(--muted); }
+
+  /* photos */
+  .photo-grid{ display:flex; gap:.9rem; flex-wrap:wrap; justify-content:center; }
+  .photo-item{ width: 150px; }
+  .photo-frame{
+    width:150px; height:150px; border-radius:16px; overflow:hidden; position:relative;
+    background: var(--surface); border:1px solid var(--surface-border);
+  }
+  .photo-frame img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .photo-fallback{
+    position:absolute; inset:0; display:none; align-items:center; justify-content:center; text-align:center;
+    font-size:.7rem; color: var(--muted); padding:.6rem; line-height:1.5;
+  }
+  .photo-frame.missing img{ display:none; }
+  .photo-frame.missing .photo-fallback{ display:flex; }
+  .photo-caption{ font-size:.78rem; color: var(--muted); margin-top:.4rem; }
+  .photo-fallback code{ background: rgba(255,255,255,.08); padding:.05rem .3rem; border-radius:5px; }
+
+  /* video */
+  .video-card{ background: var(--surface); border:1px solid var(--surface-border); border-radius:20px; padding:1rem; width:100%; max-width:400px; position:relative; }
+  .video-card video{ width:100%; border-radius:14px; display:block; background:#000; max-height:48vh; }
+  .video-fallback{
+    position:absolute; inset:1rem; border-radius:14px; background: rgba(255,255,255,.04);
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    font-size:.85rem; color: var(--muted); padding:1rem; line-height:1.6; pointer-events:none;
+  }
+  .video-fallback code{ background: rgba(255,255,255,.08); padding:.1rem .35rem; border-radius:6px; }
+
+  /* ================= Scene 3: hug & kiss ================= */
+  .final-btns{ display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; }
+  .final-btn-wrap{ position:relative; }
+  .burst-heart{ position:absolute; left:50%; top:0; font-size:1.2rem; pointer-events:none; animation: burst .9s ease-out forwards; }
+  @keyframes burst{ to{ transform: translate(var(--dx), var(--dy)) scale(0); opacity:0; } }
+  .final-msg{ min-height: 2.2rem; font-weight:600; color: var(--pink-soft); font-size:.95rem; }
+
+  /* ================= nav ================= */
+  .nav{ position:fixed; bottom: 3vh; left:0; right:0; z-index:10; display:flex; align-items:center; justify-content:center; gap:1rem; }
+  .nav.hidden{ display:none; }
+  .dots{ display:flex; gap:.35rem; }
+  .dot{ width:7px; height:7px; border-radius:50%; background: rgba(255,255,255,.18); transition: background .3s, transform .3s; }
+  .dot.active{ background: var(--pink); transform: scale(1.3); }
+  .arrow{ background: var(--surface); border:1px solid var(--surface-border); width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:.95rem; color: var(--white); transition: transform .2s; }
+  .arrow:hover{ transform: scale(1.1); }
+  .arrow:disabled{ opacity:.2; cursor:default; }
+
+  @media (prefers-reduced-motion: reduce){ *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
+  @media (max-width: 420px){ .keypad{ grid-template-columns: repeat(3, 56px); } .key{ width:56px; height:56px; } .choice-card{ width:120px; } .photo-frame{ width:110px; height:110px; } }
+</style>
+</head>
+<body>
+
+<div class="ambient" id="ambient"></div>
+
+<div class="stage">
+
+  <!-- Scene 0: passcode lock -->
+  <section class="scene active" data-scene="0">
+    <div class="scene-inner">
+      <div class="lock-icon">🖤</div>
+      <h2>For You, Anuy</h2>
+      <p style="margin-top:-.4rem;">Masukin kode rahasia buat buka</p>
+      <div class="dots-code" id="dotsCode"></div>
+      <div class="keypad" id="keypad"></div>
+      <p class="lock-error" id="lockError">&nbsp;</p>
+      <p class="hint" id="lockHint"></p>
+    </div>
+  </section>
+
+  <!-- Scene 1: envelope + letter -->
+  <section class="scene" data-scene="1">
+    <div class="scene-inner">
+
+      <div id="envelopeStage">
+        <span class="eyebrow">sebuah surat digital</span>
+        <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Buka surat" style="margin-top:1rem;">
+          <div class="body"></div>
+          <div class="flap"></div>
+          <div class="heart-seal">💌</div>
+        </div>
+        <h1 style="margin-top:1.2rem;">Untuk Anuy</h1>
+        <p>dari Mimi, yang nulis ini sambil senyum-senyum sendiri</p>
+        <button class="btn" id="openBtn" style="margin-top:.6rem;">Buka Suratnya</button>
+      </div>
+
+      <div id="letterStage" style="display:none;">
+        <span class="eyebrow">sepucuk surat</span>
+        <h2 style="margin:.6rem 0;">A Letter For You 🖤</h2>
+        <div class="letter-card">
+          <p>Untuk Anuy, orang yang paling Mimi sayang</p>
+          <p>Aku pernah berpikir, waktu tidak sekadar merangkai detik. Semesta sedang menenun sebuah proses pendewasaan yang terlalu tenang untuk riuh dunia, dan kemudian membentuknya menjadi keteguhan dalam diri seorang Yanur.</p>
+          <p> Sebab ada sesuatu dalam dirimu yang melampaui sekadar pertambahan angka. Sebelum hari-hari menagih pembuktian tentang arti menjadi kuat, keberadaanmu di usia ke-22 ini sudah menjadi jawaban bahwasanya ketabahan tidak selalu harus bersuara nyaring. Di balik tenang dan lembut yang kau simpan, ada jiwa yang tak pernah menyerah pada badai.</p>
+          <p>SDua puluh dua tahun bukanlah sekadar angka perjalanan, melainkan cara dunia merayakan keteguhanmu. Hari ini, doa-doa terbaik melangit—memohon agar setiap langkahmu senantiasa dilindungi, tubuh dan jiwamu diberi ketenangan, serta setiap mimpi yang kau perjuangkan pelan-pelan menemukan bentuk terindahnya. Semoga kamu senantiasa tumbuh menjadi pribadi yang hangat, kuat, dan dirahmati di setiap langkah.</p>
+          <p>Selamat bertambah usia, Yanur.</p>
+          <p class="letter-sign">— Dari Mimi, yang selalu mendoakan dan menyayangimu💗</p>
+        </div>
+        <button class="btn next-btn" style="margin-top:1rem;">Terusin →</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Scene 2: hub (buket / kue / lagu) -->
+  <section class="scene" data-scene="2">
+    <div class="scene-inner">
+
+      <div id="hubChoices" class="hub-panel">
+        <span class="eyebrow">pilih dulu</span>
+        <h2>Mau Buka Apa Dulu?</h2>
+        <div class="choice-grid">
+          <div class="choice-card" data-target="hubBuket"><span class="ic">💐</span><span>Buket</span></div>
+          <div class="choice-card" data-target="hubKue"><span class="ic">🎂</span><span>Kue</span></div>
+          <div class="choice-card" data-target="hubLagu"><span class="ic">🎵</span><span>Lagu</span></div>
+        </div>
+        <button class="btn ghost small next-btn" style="margin-top:.6rem;">Lanjut ke Penutup →</button>
+      </div>
+
+      <div id="hubBuket" class="hub-panel" style="display:none;">
+        <button class="back-link">← kembali pilih</button>
+        <span class="eyebrow">buket fortune lucky</span>
+        <h2>Botol Fortune Lucky</h2>
+        <p style="margin-top:-.5rem;">Klik botolnya buat ambil satu pesan untuk anuy</p>
+        <div class="bottle" id="bottleBtn">🍾</div>
+        <div class="fortune-slip" id="fortuneSlip">&nbsp;</div>
+        <p class="fortune-count" id="fortuneCount"></p>
+      </div>
+
+      <div id="hubKue" class="hub-panel" style="display:none;">
+        <button class="back-link">← kembali pilih</button>
+        <span class="eyebrow">tiup lilinnya</span>
+        <h2>Foto Kenangan</h2>
+        <div class="photo-grid">
+          <div class="photo-item">
+            <div class="photo-frame">
+              <img src="foto/kecil.jpg" alt="Anuy kecil" onerror="this.parentElement.classList.add('missing')">
+              <div class="photo-fallback">taruh di<br><code>foto/kecil.jpg</code></div>
+            </div>
+            <p class="photo-caption">Anuy kecil, udah gemesin dari dulu 🍼</p>
+          </div>
+          <div class="photo-item">
+            <div class="photo-frame">
+              <img src="foto/sekarang1.jpg" alt="Anuy sekarang" onerror="this.parentElement.classList.add('missing')">
+              <div class="photo-fallback">taruh di<br><code>foto/sekarang1.jpg</code></div>
+            </div>
+            <p class="photo-caption">Anuy sekarang, makin ganteng & dewasa</p>
+          </div>
+          <div class="photo-item">
+            <div class="photo-frame">
+              <img src="foto/sekarang2.jpg" alt="Anuy sekarang" onerror="this.parentElement.classList.add('missing')">
+              <div class="photo-fallback">taruh di<br><code>foto/sekarang2.jpg</code></div>
+            </div>
+            <p class="photo-caption">Momen favorit Mimi liat Anuy dari VC</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="hubLagu" class="hub-panel" style="display:none;">
+        <button class="back-link">← kembali pilih</button>
+        <span class="eyebrow">buat Anuy dengerin</span>
+        <h2>Lagu Kecil dari Mimi</h2>
+        <p style="margin-top:-.5rem;">Semoga Anuy terhibur hehehe, ini lagu khusus buat anuy</p>
+        <div class="video-card">
+          <video id="birthdayVideo" controls playsinline poster="video/cover.jpg">
+            <source src="video/untuk-anuy.mp4" type="video/mp4">
+          </video>
+          <div class="video-fallback" id="videoFallback">
+            🎥 Video belum ketemu.<br>Taruh file video kamu di folder <code>video/</code> dengan nama <code>untuk-anuy.mp4</code>.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Scene 3: closing + hug/kiss -->
+  <section class="scene" data-scene="3">
+    <div class="scene-inner">
+      <span class="eyebrow">sekali lagi,</span>
+      <h1>Selamat Ulang Tahun, Anuy 🎂</h1>
+      <p>22 tahun makin mantap, makin sayang, makin kangen pengen ketemu.</p>
+      <p style="font-family: var(--font-display); font-size:1.1rem; color: var(--pink-soft);">Dari Mimi, yang sayang anuy walau belum pernah ketemu 💗</p>
+      <div class="final-btns">
+        <div class="final-btn-wrap"><button class="btn" id="hugBtn">Give Hug 🤗</button></div>
+        <div class="final-btn-wrap"><button class="btn ghost" id="kissBtn">Give Kiss 💋</button></div>
+      </div>
+      <p class="final-msg" id="finalMsg">&nbsp;</p>
+    </div>
+  </section>
+
+</div>
+
+<div class="nav" id="nav">
+  <button class="arrow" id="prevBtn" aria-label="Sebelumnya">←</button>
+  <div class="dots" id="dots"></div>
+  <button class="arrow" id="nextBtn" aria-label="Selanjutnya">→</button>
+</div>
+
+<script>
+(function(){
+
+  /* ===================== EDIT DI SINI ===================== */
+  const CONFIG = {
+    passcode: "1908", // tanggal ulang tahun Anuy
+    passcodeHint: "petunjuk: tanggal ulang tahun anuy 🎂",
+    fortunes: [
+      "Selamat ulang tahun! Semoga tahun ini penuh senyum kecil yang bikin hari-harimu ringan.",
+      "Anuy udah jauh berjalan sampai sejauh ini — bangga banget sama anuy.",
+      "Jangan lupa istirahat, kesehatanmu nomor satu buat Mimi.",
+      "Semangat terus buat semua rencana yang lagi anuy kejar.",
+      "Sesibuk apapun harimu, jangan lupa minum air putih ya.",
+      "Anuy lebih kuat dari yang anuy kira, percaya deh.",
+      "Terus jadi orang baik, itu salah satu alasan Mimi sayang anuy.",
+      "Kalau capek, istirahat itu bukan kalah, itu strategi.",
+      "Jangan nakal-nakal, Mimi tetap merhatiin walau dari jauh.",
+      "Semoga rejekimu lancar dan mimpi-mimpimu pelan-pelan kewujud.",
+      "Ingat, sejauh apapun jaraknya, ada Mimi yang selalu doain anuy.",
+      "Tidur yang cukup ya, jangan begadang mulu."
+    ]
+  };
+  /* =========================================================== */
+
+  const scenes = Array.from(document.querySelectorAll('.scene'));
+  const dotsWrap = document.getElementById('dots');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const navEl = document.getElementById('nav');
+  let current = 0;
+  let unlocked = false;
+
+  scenes.forEach((_, i)=>{
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===0 ? ' active' : '');
+    dotsWrap.appendChild(d);
+  });
+  const dots = Array.from(dotsWrap.children);
+  navEl.classList.add('hidden');
+
+  function goTo(i){
+    if(i < 0 || i >= scenes.length) return;
+    if(i > 0 && !unlocked) return;
+    scenes[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = i;
+    scenes[current].classList.add('active');
+    dots[current].classList.add('active');
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === scenes.length - 1;
+    navEl.classList.remove('hidden');
+    if(current === 2) resetHub();
+  }
+
+  document.querySelectorAll('.next-btn').forEach(b => b.addEventListener('click', ()=> goTo(current+1)));
+  prevBtn.addEventListener('click', ()=> goTo(current-1));
+  nextBtn.addEventListener('click', ()=> goTo(current+1));
+
+  document.addEventListener('keydown', (e)=>{
+    if(!unlocked) return;
+    if(e.key === 'ArrowRight') goTo(current+1);
+    if(e.key === 'ArrowLeft') goTo(current-1);
+  });
+
+  let touchX = null;
+  document.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
+  document.addEventListener('touchend', e => {
+    if(touchX === null || !unlocked) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if(dx > 50) goTo(current-1);
+    if(dx < -50) goTo(current+1);
+    touchX = null;
+  });
+
+  /* ---------- Scene 0: passcode lock ---------- */
+  const dotsCode = document.getElementById('dotsCode');
+  const keypad = document.getElementById('keypad');
+  const lockError = document.getElementById('lockError');
+  const lockHint = document.getElementById('lockHint');
+  lockHint.textContent = CONFIG.passcodeHint;
+  let entered = '';
+
+  for(let i=0;i<CONFIG.passcode.length;i++){
+    const d = document.createElement('div');
+    d.className = 'dot-code';
+    dotsCode.appendChild(d);
+  }
+  const codeDots = Array.from(dotsCode.children);
+
+  const keys = ['1','2','3','4','5','6','7','8','9','X','0','←'];
+  keys.forEach(k=>{
+    const b = document.createElement('button');
+    b.className = 'key' + (k==='X' || k==='←' ? ' fn' : '');
+    b.textContent = k;
+    b.addEventListener('click', ()=> handleKey(k));
+    keypad.appendChild(b);
+  });
+
+  function handleKey(k){
+    if(k === 'X'){ entered=''; renderDots(); return; }
+    if(k === '←'){ entered = entered.slice(0,-1); renderDots(); return; }
+    if(entered.length >= CONFIG.passcode.length) return;
+    entered += k;
+    renderDots();
+    if(entered.length === CONFIG.passcode.length){
+      setTimeout(checkCode, 150);
+    }
+  }
+
+  function renderDots(){
+    codeDots.forEach((d,i)=> d.classList.toggle('filled', i < entered.length));
+  }
+
+  function checkCode(){
+    if(entered === CONFIG.passcode){
+      lockError.textContent = '';
+      unlocked = true;
+      setTimeout(()=> goTo(1), 200);
+    } else {
+      lockError.textContent = 'Kode salah, coba lagi';
+      dotsCode.classList.add('shake');
+      setTimeout(()=>{ dotsCode.classList.remove('shake'); entered=''; renderDots(); }, 400);
+    }
+  }
+
+  /* ---------- Scene 1: envelope -> letter ---------- */
+  const envelope = document.getElementById('envelope');
+  const openBtn = document.getElementById('openBtn');
+  const envelopeStage = document.getElementById('envelopeStage');
+  const letterStage = document.getElementById('letterStage');
+  function openEnvelope(){
+    envelope.classList.add('open');
+    launchConfetti();
+    setTimeout(()=>{
+      envelopeStage.style.display = 'none';
+      letterStage.style.display = 'block';
+    }, 550);
+  }
+  envelope.addEventListener('click', openEnvelope);
+  envelope.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' ') openEnvelope(); });
+  openBtn.addEventListener('click', openEnvelope);
+
+  /* ---------- confetti ---------- */
+  function launchConfetti(){
+    const colors = ['#FF6FB5','#E8397F','#FFB8DA','#FFFFFF'];
+    for(let i=0;i<36;i++){
+      const p = document.createElement('div');
+      p.className = 'confetti-piece';
+      const size = 6 + Math.random()*6;
+      p.style.width = size+'px';
+      p.style.height = (size*0.4)+'px';
+      p.style.left = Math.random()*100+'vw';
+      p.style.background = colors[Math.floor(Math.random()*colors.length)];
+      p.style.animationDelay = (Math.random()*0.4)+'s';
+      p.style.animationDuration = (2 + Math.random()*1.2)+'s';
+      document.body.appendChild(p);
+      setTimeout(()=> p.remove(), 3600);
+    }
+  }
+
+  /* ---------- ambient sparkles ---------- */
+  const ambient = document.getElementById('ambient');
+  const ambientEmojis = ['💗','✨','🖤','💮'];
+  for(let i=0;i<12;i++){
+    const s = document.createElement('span');
+    s.textContent = ambientEmojis[Math.floor(Math.random()*ambientEmojis.length)];
+    s.style.left = Math.random()*100+'%';
+    s.style.animationDuration = (9 + Math.random()*9)+'s';
+    s.style.animationDelay = (Math.random()*9)+'s';
+    ambient.appendChild(s);
+  }
+
+  /* ---------- Scene 2: hub ---------- */
+  const hubChoices = document.getElementById('hubChoices');
+  const hubPanels = {
+    hubBuket: document.getElementById('hubBuket'),
+    hubKue: document.getElementById('hubKue'),
+    hubLagu: document.getElementById('hubLagu')
+  };
+
+  function resetHub(){
+    hubChoices.style.display = 'flex';
+    Object.values(hubPanels).forEach(p => p.style.display = 'none');
+  }
+
+  document.querySelectorAll('.choice-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      hubChoices.style.display = 'none';
+      hubPanels[card.dataset.target].style.display = 'flex';
+    });
+  });
+  document.querySelectorAll('.back-link').forEach(b=>{
+    b.addEventListener('click', resetHub);
+  });
+
+  /* fortune bottle */
+  const bottleBtn = document.getElementById('bottleBtn');
+  const fortuneSlip = document.getElementById('fortuneSlip');
+  const fortuneCount = document.getElementById('fortuneCount');
+  let fortuneClicks = 0;
+  let usedFortunes = [];
+  bottleBtn.addEventListener('click', ()=>{
+    bottleBtn.classList.remove('shaking'); void bottleBtn.offsetWidth; bottleBtn.classList.add('shaking');
+    if(usedFortunes.length === CONFIG.fortunes.length) usedFortunes = [];
+    let idx;
+    do{ idx = Math.floor(Math.random()*CONFIG.fortunes.length); } while(usedFortunes.includes(idx) && usedFortunes.length < CONFIG.fortunes.length);
+    usedFortunes.push(idx);
+    fortuneClicks++;
+    setTimeout(()=>{
+      fortuneSlip.textContent = CONFIG.fortunes[idx];
+      fortuneSlip.classList.add('show');
+      fortuneCount.textContent = 'pesan ke-' + fortuneClicks;
+    }, 200);
+  });
+
+  /* video fallback */
+  const bdayVideo = document.getElementById('birthdayVideo');
+  const videoFallback = document.getElementById('videoFallback');
+  videoFallback.style.display = 'none';
+  bdayVideo.addEventListener('error', ()=>{
+    bdayVideo.style.visibility = 'hidden';
+    videoFallback.style.display = 'flex';
+  });
+
+  /* ---------- Scene 3: hug & kiss ---------- */
+  const hugBtn = document.getElementById('hugBtn');
+  const kissBtn = document.getElementById('kissBtn');
+  const finalMsg = document.getElementById('finalMsg');
+  const hugMessages = [
+    'Pelukan terkirim lewat sinyal wifi... 🛜💗 sampe ya!',
+    'Loading pelukan... 100%. Semoga kerasa hangatnya. 🤍',
+    'Satu paket peluk jarak jauh, terkirim. Ditunggu peluk versi aslinya ya 🥹'
+  ];
+  const kissMessages = [
+    'Satu Kiss terkirim, jangan dihapus ya 💋',
+    'Ini kiss selamat ulang tahun spesial, cuma buat anuy 💋💋.',
+    'Kiss jarak jauh, tapi sayangnya beneran deket kok.'
+  ];
+
+  function burst(wrapEl, emojis){
+    for(let i=0;i<10;i++){
+      const h = document.createElement('span');
+      h.className = 'burst-heart';
+      h.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      const angle = Math.random()*Math.PI*2;
+      const dist = 60 + Math.random()*60;
+      h.style.setProperty('--dx', Math.cos(angle)*dist+'px');
+      h.style.setProperty('--dy', (Math.sin(angle)*dist - 40)+'px');
+      wrapEl.appendChild(h);
+      setTimeout(()=> h.remove(), 950);
+    }
+  }
+
+  hugBtn.addEventListener('click', ()=>{
+    finalMsg.textContent = hugMessages[Math.floor(Math.random()*hugMessages.length)];
+    burst(hugBtn.parentElement, ['💗','💕','🤍']);
+  });
+  kissBtn.addEventListener('click', ()=>{
+    finalMsg.textContent = kissMessages[Math.floor(Math.random()*kissMessages.length)];
+    burst(kissBtn.parentElement, ['💋','💗','✨']);
+  });
+
+})();
+</script>
+
+</body>
+</html>
